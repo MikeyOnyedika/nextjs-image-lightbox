@@ -1,0 +1,10 @@
+.Grid{
+  display: flex;
+  gap: 1rem;
+}
+
+.media_item{
+  display: flex;
+  position: relative;
+  border: 2px solid green;
+}

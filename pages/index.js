@@ -27,9 +27,9 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
+      <main className={Styles.Main}>
         {
-          currentGallery && <Lightbox gallery={currentGallery} close={closeLightbox} />
+          currentGallery && <Lightbox images={currentGallery} close={closeLightbox} />
         }
         <div className={Styles.Grid}>
           {galleries.map((gallery, i) => {
@@ -38,13 +38,13 @@ export default function Home() {
             return (
               <button key={i} className={styles.media_item} href="#" onClick={() => openLightbox(gallery)}>
                 <Image
-                  src={backgroundImage?.Image}
-                  alt={backgroundImage?.Text}
+                  src={backgroundImage?.image}
+                  alt={backgroundImage?.text}
                   fill
                   sizes={"10vh"}
                 />
                 <div className={Styles.BtnText}>
-                  <h2>{backgroundImage?.Text}</h2>
+                  <h2>{backgroundImage?.text}</h2>
                   <h5>View Collection</h5>
                 </div>
               </button>

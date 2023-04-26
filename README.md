@@ -25,7 +25,12 @@ export default function Home(){
         setImages(null)
     }
     return (
-        <Lightbox images={images} close={closeLightbox} />
+        <div>
+            {
+                images && <Lightbox images={images} close={closeLightbox} />
+            }
+            <OtherComponents />
+        </div>
     )
 }
 ```

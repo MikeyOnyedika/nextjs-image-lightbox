@@ -29,7 +29,7 @@ export const Lightbox = ({ images, close }) => {
 
 	function copyImageUrl(text) {
 		navigator.clipboard.writeText(text)
-		alert("Image url copied: " + images[imageIndex].Image)
+		alert("Image url copied!")
 	}
 
 	function prevImage() {
@@ -49,32 +49,35 @@ export const Lightbox = ({ images, close }) => {
 	return (
 		<div className={Styles.Wrapper}>
 			<div className={Styles.ContentWrapper}>
+
+				<div className={Styles.ToolsMenu}>
+					<div className={Styles.Options}>
+						<button type='button' onClick={() => copyImageUrl(images[imageIndex].image)} className={Styles.CopyBtn}>
+							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
+								<FaEdit />
+							</IconContext.Provider>
+						</button>
+						<a href="" download={images[imageIndex].image}>
+							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
+								<FaArrowDown />
+							</IconContext.Provider>
+						</a>
+					</div>
+
+					<button type='button' className={Styles.CloseBtn} onClick={close}>
+						<CloseBtn />
+					</button>
+				</div>
+
 				<div className={Styles.LargeImageViewWrapper} ref={largeImageViewWrapperRef}>
 					<div className={Styles.LargeImageWrapper} >
 						<Image className={Styles.LargeImage} alt={images[imageIndex].text} src={images[imageIndex].image} fill />
-						<button type='button' className={Styles.CloseBtn} onClick={close}>
-							<CloseBtn />
-						</button>
-
-						<div className={Styles.HoverBtnGroup}>
-							<button type='button' onClick={() => copyImageUrl(images[imageIndex].Image)} className={Styles.CopyBtn}>
-								<IconContext.Provider value={{ className: Styles.HoverBtnGroupIcon }}>
-									<FaEdit />
-								</IconContext.Provider>
-							</button>
-							<a href="" download={images[imageIndex].Image}>
-								<IconContext.Provider value={{ className: Styles.HoverBtnGroupIcon }}>
-									<FaArrowDown />
-								</IconContext.Provider>
-							</a>
-						</div>
 
 						<button onClick={prevImage} className={Styles.Btn}>
 							<IconContext.Provider value={{ className: `${Styles.LargeBtnIcon} ${Styles.Left}` }}>
 								<FaAngleLeft />
 							</IconContext.Provider>
 						</button>
-
 
 						<button onClick={nextImage} className={Styles.Btn}>
 							<IconContext.Provider value={{ className: `${Styles.LargeBtnIcon} ${Styles.Right}` }}>

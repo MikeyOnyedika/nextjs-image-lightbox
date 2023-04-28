@@ -17,6 +17,48 @@
 }
 
 
+/* tools menu */
+.ToolsMenu {
+	display: flex;
+	justify-content: flex-end;
+	padding-inline: 1rem;
+	padding-block: 0.2rem;
+	background-color: white;
+	gap: 3rem;
+}
+
+.Options {
+	display: flex;
+	gap: 0.5rem;
+	color: rgba(0, 0, 0, 0.9);
+}
+
+.SliderBtn,
+.Btn,
+.CloseBtn,
+.CopyBtn {
+	background: transparent;
+	border: none;
+}
+
+
+.OptionBtnIcon {
+	color: rgba(0, 0, 0, 0.9);
+	font-size: 1.2rem;
+	padding: 0.1rem;
+}
+
+
+.CloseBtn {
+	background-color: transparent;
+	outline: none;
+	display: flex;
+	align-items: center;
+}
+
+
+
+/* large image view */
 
 .LargeImageViewWrapper {
 	display: flex;
@@ -40,21 +82,8 @@
 	object-fit: contain;
 }
 
-.CloseBtn {
-	position: absolute;
-	right: 0rem;
-	top: 0.5rem;
-	background-color: white;
-	outline: none;
-	border: none;
-	width: 3rem;
-	aspect-ratio: 1;
-	z-index: 1;
-}
-
-
 .CloseBtn,
-.HoverBtnGroupIcon,
+.OptionBtnIcon,
 .LargeBtnIcon,
 .BtnIcon,
 .SliderBtn,
@@ -64,28 +93,6 @@
 }
 
 
-.HoverBtnGroup {
-	position: absolute;
-	bottom: 1rem;
-	right: 0rem;
-	display: flex;
-	gap: 0.5rem;
-	color: rgba(0, 0, 0, 0.9);
-}
-
-.CopyBtn {
-	background: transparent;
-	border: none;
-}
-
-
-.HoverBtnGroupIcon {
-	color: rgba(0, 0, 0, 0.9);
-	background-color: #ffffff;
-	font-size: 1.8rem;
-	padding: 0.3rem;
-}
-
 .LargeBtnIcon {
 	background: transparent;
 }
@@ -94,9 +101,8 @@
 	position: aboslute;
 	background: white;
 	color: rgba(0, 0, 0, 0.5);
-	z-index: 1;
-	border: none;
 	display: flex;
+	z-index: 1;
 }
 
 .LargeBtnIcon {
@@ -104,16 +110,12 @@
 	padding: 0.9rem;
 }
 
-.CloseBtn,
 .LargeBtnIcon,
-.HoverBtnGroupIcon,
 .Btn {
 	border-radius: 999999999999999999px;
 }
 
-.Btn,
-.CloseBtn,
-.HoverBtnGroupIcon {
+.Btn {
 	box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
@@ -132,7 +134,7 @@
 
 
 
-/* slider overflows parent container and parent container has an overflow of hidden to prevent the overflow from being visible. Then the buttons are used to move the slider. this is the idea for scrolling the slider*/
+/* slider content overflows the width of the slider */
 .Slider {
 	display: flex;
 	gap: 0.5rem;
@@ -152,7 +154,7 @@
 	position: relative;
 	height: 100%;
 	aspect-ratio: 16/9;
-	border: 1px solid #5599b7; 
+	border: 1px solid #5599b7;
 	opacity: 0.5;
 	border-radius: 2px;
 
@@ -171,10 +173,8 @@
 
 
 .SliderBtn {
-	z-index: 3;
 	font-size: 1rem;
 	padding: 0.1rem;
-	border: none;
 	outline: none;
 	background-color: rgba(170, 170, 150, 1);
 

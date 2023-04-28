@@ -7,38 +7,21 @@ import { CloseBtn } from './close'
 
 export const Lightbox = ({ images, close }) => {
 	const [imageIndex, setImageIndex] = useState(0)
-	const maxIndex = images.length - 1
 	const sliderWrapperRef = useRef()
 	const largeImageViewWrapperRef = useRef()
-	const [lastDirection, setLastDirection] = useState("right")
-	const activeImageRef = useRef()
-	const { observer, isVisible } = useIntersectionObserver()
-	const direction = {
-		LEFT: 'left',
-		RIGHT: 'right'
-	}
+	const activePreviewImgRef = useRef()
+	const maxIndex = images.length - 1
 
 
 	useEffect(() => {
-		if (activeImageRef.current != null) {
-			console.log("observe")
-			observer.observe(activeImageRef.current)
-		}
-
-		if (isVisible != null) {
-			if (isVisible === false) {
-				if (lastDirection === direction.LEFT) {
-					scrollBackward()
-				} else {
-					scrollForward()
-				}
-			}
-		}
-	}, [imageIndex, isVisible])
+		activePreviewImgRef.current.scrollIntoView({ behavior: "smooth" })
+	}, [imageIndex])
 
 	function scrollForward() {
+		console.log("scroll forward")
 		sliderWrapperRef.current.scrollBy({ top: 0, left: 200, behavior: "smooth" })
 	}
+
 
 	function scrollBackward() {
 		sliderWrapperRef.current.scrollBy({ top: 0, left: -200, behavior: "smooth" })
@@ -50,22 +33,18 @@ export const Lightbox = ({ images, close }) => {
 	}
 
 	function prevImage() {
-		setLastDirection(direction.LEFT)
 		setImageIndex(prev => {
-			if (prev === 0) return prev
+			if (prev === 0) return maxIndex
 			return prev - 1
 		})
 	}
 
 	function nextImage() {
-		setLastDirection(direction.RIGHT)
 		setImageIndex(prev => {
-			if (prev === maxIndex) return prev
+			if (prev === maxIndex) return 0
 			return prev + 1
 		})
 	}
-
-
 
 	return (
 		<div className={Styles.Wrapper}>
@@ -112,17 +91,15 @@ export const Lightbox = ({ images, close }) => {
 						</IconContext.Provider>
 					</button>
 
-					<div className={Styles.SliderWrapper} ref={sliderWrapperRef}>
-						<ul className={Styles.Slider} >
-							{
-								images.map((item, index) => (
-									<li key={index} className={`${Styles.SliderItemWrapper} ${item.id === images[imageIndex].id ? Styles.ItemActive : ""}`} onClick={() => setImageIndex(index)} tabIndex={0} ref={item.id === images[imageIndex].id ? activeImageRef : null}>
-										<Image className={Styles.SliderImage} alt={item.text} src={item.image} fill />
-									</li>
-								))
-							}
-						</ul>
-					</div>
+					<ul className={Styles.Slider} ref={sliderWrapperRef}>
+						{
+							images.map((item, index) => (
+								<li key={index} className={`${Styles.SliderItemWrapper} ${item.id === images[imageIndex].id ? Styles.ItemActive : ""}`} onClick={() => setImageIndex(index)} tabIndex={0} ref={item.id === images[imageIndex].id ? activePreviewImgRef : null}>
+									<Image className={Styles.SliderImage} alt={item.text} src={item.image} fill />
+								</li>
+							))
+						}
+					</ul>
 
 					<button type='button' onClick={() => scrollForward()} className={`${Styles.SliderBtn} ${Styles.SliderBtn__Right}`}>
 						<IconContext.Provider value={{ className: Styles.BtnIcon }}>
@@ -140,13 +117,17 @@ function useIntersectionObserver() {
 	const [isVisible, setIsVisible] = useState()
 	const observer = new IntersectionObserver((entries, observer) => {
 		entries.forEach(entry => {
-			if (entry.intersectionRatio > 0) {
-				// element is visible
-				setIsVisible(true)
-			} else {
-				// element is not visible
-				setIsVisible(false)
-			}
+			setTimeout(
+				() => {
+					if (entry.intersectionRatio > 0) {
+						// element is visible
+						setIsVisible(true)
+					} else {
+						// element is not visible
+						setIsVisible(false)
+					}
+				}, 300
+			)
 		})
 
 	}, {

@@ -128,27 +128,23 @@
 	height: 5rem;
 }
 
-.SliderWrapper {
-	display: flex;
-	align-items: stretch;
-	z-index: 0;
-	width: 100%;
-	overflow: auto;
-}
+/* changes started here */
 
-
-.SliderWrapper::-webkit-scrollbar {
-	width: 0px;
-	height: 0px;
-}
 
 
 /* slider overflows parent container and parent container has an overflow of hidden to prevent the overflow from being visible. Then the buttons are used to move the slider. this is the idea for scrolling the slider*/
 .Slider {
 	display: flex;
 	gap: 0.5rem;
-	width: fit-content;
+	width: 100%;
 	list-style-type: none;
+	position: relative;
+	overflow: auto;
+}
+
+.Slider::-webkit-scrollbar {
+	width: 0px;
+	height: 0px;
 }
 
 /*  the aspect ratio implemented is really just to provide a width which the inner img element used the in Nextjs Image component will use for setting it's own width and height since it was set to fill */
@@ -156,16 +152,16 @@
 	position: relative;
 	height: 100%;
 	aspect-ratio: 16/9;
-	border: 2px solid rgba(0, 0, 0, 0.8);
+	border: 1px solid #5599b7; 
 	opacity: 0.5;
-	border-radius: 5px;
+	border-radius: 2px;
 
 }
 
 
 .ItemActive {
 	opacity: 1;
-	border-width: 3px;
+	border-width: 2px;
 }
 
 /* preserve the aspect ratio of the actual image*/

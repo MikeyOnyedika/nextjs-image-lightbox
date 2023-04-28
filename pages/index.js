@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import styles from '@/styles/Home.module.css'
 import { useState } from "react";
 import { Lightbox } from "@/components/Lightbox";
@@ -37,11 +36,11 @@ export default function Home() {
             const backgroundImage = gallery[randomImageIndex]
             return (
               <button key={i} className={styles.media_item} href="#" onClick={() => openLightbox(gallery)}>
-                <Image
+                <img
                   src={backgroundImage?.image}
                   alt={backgroundImage?.text}
-                  fill
-                  sizes={"10vh"}
+                  width={200}
+                  height={"auto"}
                 />
                 <div className={Styles.BtnText}>
                   <h2>{backgroundImage?.text}</h2>

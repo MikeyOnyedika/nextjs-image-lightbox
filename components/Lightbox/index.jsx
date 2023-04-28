@@ -8,16 +8,13 @@ import { CloseBtn } from './close'
 
 export const Lightbox = ({ images, close }) => {
 	const [imageIndex, setImageIndex] = useState(0)
-	const [currentZoomLevel, setCurrentZoomLevel] = useState(0)
 	const sliderWrapperRef = useRef()
 	const largeImageViewWrapperRef = useRef()
 	const activePreviewImgRef = useRef()
 	const largeImgRef = useRef()
-
+	const { zoomIn, zoomOut, zoomLevel, normalizeZoom } = useImageZoom()
 
 	const maxIndex = images.length - 1
-	const maxZoomInLevel = 5
-	const maxZoomOutLevel = -5
 
 	//if currently selected image preview is not visible, scroll it into view
 	useEffect(() => {
@@ -26,16 +23,9 @@ export const Lightbox = ({ images, close }) => {
 
 
 	useEffect(() => {
-		let width = largeImgRef.current.clientWidth
-		console.log(width)
-
-		const multiplier = 0.2 + currentZoomLevel
-
-		width = width * multiplier
-
-		console.log(width)
-	}, [currentZoomLevel])
-
+		largeImgRef.current.style.scale = zoomLevel
+		largeImgRef.current.style["object-position"] = "50%"
+	}, [zoomLevel])
 
 	function scrollForward() {
 		console.log("scroll forward")
@@ -53,6 +43,7 @@ export const Lightbox = ({ images, close }) => {
 	}
 
 	function prevImage() {
+		normalizeZoom()
 		setImageIndex(prev => {
 			if (prev === 0) return maxIndex
 			return prev - 1
@@ -60,29 +51,13 @@ export const Lightbox = ({ images, close }) => {
 	}
 
 	function nextImage() {
+		normalizeZoom()
 		setImageIndex(prev => {
 			if (prev === maxIndex) return 0
 			return prev + 1
 		})
 	}
 
-	function zoomIn() {
-		setCurrentZoomLevel(
-			prev => {
-				if (prev === maxZoomInLevel) return prev
-				return prev + 1
-			}
-		)
-	}
-
-	function zoomOut() {
-		setCurrentZoomLevel(
-			prev => {
-				if (prev === maxZoomOutLevel) return prev
-				return prev - 1
-			}
-		)
-	}
 
 	return (
 		<div className={Styles.Wrapper}>
@@ -118,21 +93,21 @@ export const Lightbox = ({ images, close }) => {
 				</div>
 
 				<div className={Styles.LargeImageViewWrapper} ref={largeImageViewWrapperRef}>
+					<button onClick={prevImage} className={`${Styles.LargeImgNavBtn} ${Styles.LargeImgNavBtn__Left}`}>
+						<IconContext.Provider value={{ className: Styles.LargeBtnIcon }}>
+							<FaAngleLeft />
+						</IconContext.Provider>
+					</button>
+
 					<div className={Styles.LargeImageWrapper} >
 						<Image className={Styles.LargeImage} alt={images[imageIndex].text} src={images[imageIndex].image} fill ref={largeImgRef} />
-
-						<button onClick={prevImage} className={Styles.Btn}>
-							<IconContext.Provider value={{ className: `${Styles.LargeBtnIcon} ${Styles.Left}` }}>
-								<FaAngleLeft />
-							</IconContext.Provider>
-						</button>
-
-						<button onClick={nextImage} className={Styles.Btn}>
-							<IconContext.Provider value={{ className: `${Styles.LargeBtnIcon} ${Styles.Right}` }}>
-								<FaAngleRight />
-							</IconContext.Provider>
-						</button>
 					</div>
+
+					<button onClick={nextImage} className={`${Styles.LargeImgNavBtn} ${Styles.LargeImgNavBtn__Right}`}>
+						<IconContext.Provider value={{ className: Styles.LargeBtnIcon }}>
+							<FaAngleRight />
+						</IconContext.Provider>
+					</button>
 				</div>
 
 				<div className={Styles.ImagePreviewWrapper}>
@@ -163,30 +138,56 @@ export const Lightbox = ({ images, close }) => {
 	)
 }
 
+function useImageZoom() {
+	// zoom level ---- 0.4x 0.6x 0.8x 1x 1.2x 1.4x 1.6x 1.8x 2.0x
+	const [currentZoomLevel, setCurrentZoomLevel] = useState(1)
+	const maxZoomInLevel = 2.4
+	const maxZoomOutLevel = 0.4
+	const delta = 0.2
 
-function useIntersectionObserver() {
-	const [isVisible, setIsVisible] = useState()
-	const observer = new IntersectionObserver((entries, observer) => {
-		entries.forEach(entry => {
-			setTimeout(
-				() => {
-					if (entry.intersectionRatio > 0) {
-						// element is visible
-						setIsVisible(true)
-					} else {
-						// element is not visible
-						setIsVisible(false)
-					}
-				}, 300
-			)
-		})
-
-	}, {
-		root: null,
-		rootMargin: '0px',
-		threshold: 0
-	})
-	return {
-		observer, isVisible
+	function zoomIn() {
+		setCurrentZoomLevel(
+			prev => {
+				if (prev === maxZoomInLevel) {
+					console.log("prev: ", prev)
+					return prev
+				}
+				return sumDecimals(prev, delta)
+			}
+		)
 	}
+
+	function zoomOut() {
+		setCurrentZoomLevel(
+			prev => {
+				if (prev === maxZoomOutLevel) {
+					console.log("prev: ", prev)
+					return prev
+				}
+				return subtractDecimals(prev, delta)
+			}
+		)
+	}
+
+
+	// sumDecimals  and subtractDecimals are used to avoid the weird issue with adding or subtracting less than 1 numbers in javascript
+	function sumDecimals(num1, num2) {
+		return ((num1 * 10) + (num2 * 10)) / 10
+	}
+
+	function subtractDecimals(num1, num2) {
+		return ((num1 * 10) - (num2 * 10)) / 10
+	}
+
+	function normalizeZoom() {
+		setCurrentZoomLevel(1)
+	}
+
+	return {
+		zoomIn,
+		zoomOut,
+		zoomLevel: currentZoomLevel,
+		normalizeZoom
+	}
+
 }

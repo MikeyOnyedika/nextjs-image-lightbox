@@ -1,5 +1,5 @@
-# Scrollable React Lightbox
-A Scrollable image lightbox written in reactjs
+# Nextjs Image Lightbox
+A lightbox which leverages nextjs Image component. Build with nextjs for nextjs projects
 
 ### Demo
 ![demo gif](./public/demo.gif)

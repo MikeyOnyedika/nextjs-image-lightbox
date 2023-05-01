@@ -6,6 +6,13 @@
 	display: flex;
 	z-index: 100;
 	background-color: rgba(255, 255, 255, 0.8);
+
+}
+
+.Wrapper * {
+	margin: 0;
+	padding: 0;
+	/* box-sizing: border-box; */
 }
 
 .ContentWrapper {
@@ -20,32 +27,49 @@
 /* tools menu */
 .ToolsMenu {
 	display: flex;
-	justify-content: flex-end;
-	padding-inline: 1rem;
-	padding-block: 0.2rem;
+	justify-content: space-between;
+	align-items: center;
 	background-color: white;
+	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 	gap: 3rem;
+	width: 100%;
+}
+
+.ToolsMenu>h3 {
+	font-weight: 400;
+	justify-self: flex-start;
+	padding-inline-start: 1rem;
+	max-width: 40%;
+	text-overflow: ellipsis;
+	line-clamp: 1;
+	-webkit-line-clamp: 1;
+	overflow: hidden;
+	white-space: nowrap;
 }
 
 .Options {
 	display: flex;
-	gap: 0.5rem;
 	color: rgba(0, 0, 0, 0.9);
 }
 
 .SliderBtn,
 .LargeImgNavBtn,
 .CloseBtn,
-.CopyBtn {
+.ToolBtn {
 	background: transparent;
 	border: none;
+}
+
+.ToolBtn {
+	font-size: 1rem;
+	display: flex;
+	align-items: center;
 }
 
 
 .OptionBtnIcon {
 	color: rgba(0, 0, 0, 0.9);
-	font-size: 1.2rem;
-	padding: 0.1rem;
+	padding: 1rem;
 }
 
 
@@ -54,6 +78,7 @@
 	outline: none;
 	display: flex;
 	align-items: center;
+	padding: 1rem;
 }
 
 
@@ -71,17 +96,35 @@
 	position: relative;
 	height: 100%;
 	width: 100%;
-	/* display: flex;
-	align-items: center; */
+	display: flex;
+	justify-content: center;
 	overflow: auto;
 	z-index: 1;
 }
 
 .LargeImage {
-	position: absolute;
+	position: relative;
 	object-fit: contain;
 	-o-object-fit: contain;
-	transition: scale 300ms ease;
+	transition: all 300ms ease;
+	object-position: center;
+	transform-origin: none;
+}
+
+.LargeImage__ShiftX {
+	transform-origin: 0 center;
+}
+
+.LargeImage__ShiftY {
+	transform-origin: center 0;
+}
+
+.LargeImage__ShiftXY {
+	transform-origin: 0 0;
+}
+
+.LargeImage__NoShift {
+	transform-origin: none;
 }
 
 .LargeImgNavBtn {
@@ -102,7 +145,7 @@
 }
 
 .LargeBtnIcon {
-	font-size: 3.5rem;
+	font-size: 2rem;
 	padding: 0.9rem;
 	background: transparent;
 }
@@ -121,6 +164,17 @@
 .SliderItemWrapper,
 .LargeImgNavBtn {
 	cursor: pointer;
+}
+
+
+.CloseBtn:hover,
+.ToolBtn:hover,
+.LargeBtnIcon:hover,
+.BtnIcon:hover,
+.SliderBtn:hover,
+.SliderItemWrapper:hover,
+.LargeImgNavBtn:hover {
+	background-color: rgb(220, 220, 220);
 }
 
 
@@ -156,12 +210,10 @@
 /*  the aspect ratio implemented is really just to provide a width which the inner img element used the in Nextjs Image component will use for setting it's own width and height since it was set to fill */
 .SliderItemWrapper {
 	position: relative;
-	height: 100%;
 	aspect-ratio: 16/9;
 	border: 1px solid #5599b7;
 	opacity: 0.5;
 	border-radius: 2px;
-
 }
 
 .ItemActive {
@@ -176,19 +228,19 @@
 
 
 .SliderBtn {
-	font-size: 1rem;
+	font-size: 1.2rem;
 	padding: 0.1rem;
 	outline: none;
-	background-color: rgba(170, 170, 150, 1);
-
+	background-color: #021922;
 }
 
 .SliderBtn .BtnIcon {
 	/* background-color: black; */
-	color: black;
+	/* color: #5599b7; */
+	color: #c8eeff;
 }
 
 .SliderBtn:hover .BtnIcon,
 .SliderBtn:hover {
-	background-color: rgba(170, 170, 150, 0.5);
+	background-color: #5599b7;
 }

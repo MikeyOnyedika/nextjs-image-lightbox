@@ -2,21 +2,15 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useState } from "react";
 import { Lightbox } from "@/components/Lightbox";
-import folder from "@/components/Galleries";
+import images from "@/components/images";
 import Styles from "../styles/Home.module.css"
+import Image from 'next/image';
+import { Poppins } from 'next/font/google'
+const poppins = Poppins({ subsets: ["latin"], weight: ["400"] })
 
 export default function Home() {
-  const [currentGallery, setCurrentGallery] = useState(null)
-  const [galleries, setGalleries] = useState([folder, folder, folder, folder, folder])
-
-
-  function openLightbox(gallery) {
-    setCurrentGallery(gallery)
-  }
-
-  function closeLightbox() {
-    setCurrentGallery(null)
-  }
+  const [isOpen, setIsOpen] = useState(false)
+  const backgroundImage = images[0]
 
   return (
     <>
@@ -26,29 +20,24 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={Styles.Main}>
+      <main className={`${Styles.Main} ${poppins.className}`}>
         {
-          currentGallery && <Lightbox images={currentGallery} close={closeLightbox} />
+          isOpen && <Lightbox images={images} close={() => setIsOpen(false)} />
         }
-        <div className={Styles.Grid}>
-          {galleries.map((gallery, i) => {
-            const randomImageIndex = Math.floor(Math.random() * gallery.length - 1)
-            const backgroundImage = gallery[randomImageIndex]
-            return (
-              <button key={i} className={styles.media_item} href="#" onClick={() => openLightbox(gallery)}>
-                <img
-                  src={backgroundImage?.image}
-                  alt={backgroundImage?.text}
-                  width={200}
-                  height={"auto"}
-                />
-                <div className={Styles.BtnText}>
-                  <h2>{backgroundImage?.text}</h2>
-                  <h5>View Collection</h5>
-                </div>
-              </button>
-            )
-          })}
+        <h1>Nextjs Image Lightbox</h1>
+        <div>
+          <button className={styles.media_item} href="#" onClick={() => setIsOpen(true)}>
+            <Image
+              src={backgroundImage.image}
+              alt={backgroundImage.text}
+              width={200}
+              height={150}
+            />
+            <div className={Styles.BtnText}>
+              <h2>{backgroundImage?.text}</h2>
+              <p>View Collection</p>
+            </div>
+          </button>
         </div>
 
       </main>

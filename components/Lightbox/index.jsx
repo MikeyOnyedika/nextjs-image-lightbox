@@ -1,34 +1,90 @@
 import Styles from './styles.module.css'
 import Image from 'next/image'
 import { useRef, useState, useEffect } from 'react'
-import { FaArrowDown, FaAngleRight, FaAngleLeft, FaEdit } from 'react-icons/fa'
-import { HiZoomIn, HiZoomOut } from 'react-icons/hi'
+import { FaAngleRight, FaAngleLeft, FaRegCopy } from 'react-icons/fa'
+import { HiOutlineDownload, HiZoomIn, HiZoomOut } from 'react-icons/hi'
 import { IconContext } from 'react-icons'
 import { CloseBtn } from './close'
+import { useImageZoom } from './useImageZoom'
 
 export const Lightbox = ({ images, close }) => {
 	const [imageIndex, setImageIndex] = useState(0)
+	const [largeImgOverflow, setLargeImgOverflow] = useState({ x: false, y: false })
+
 	const sliderWrapperRef = useRef()
 	const largeImageViewWrapperRef = useRef()
 	const activePreviewImgRef = useRef()
 	const largeImgRef = useRef()
-	const { zoomIn, zoomOut, zoomLevel, normalizeZoom } = useImageZoom()
+	const largeImgWrapperRef = useRef()
+
+	const { zoomIn, zoomOut, zoomLevel, normalizeZoom, zoomDirection } = useImageZoom()
 
 	const maxIndex = images.length - 1
 
 	//if currently selected image preview is not visible, scroll it into view
 	useEffect(() => {
+		normalizeZoom()
 		activePreviewImgRef.current.scrollIntoView({ behavior: "smooth" })
 	}, [imageIndex])
 
 
+
+	// useEffect(() => {
+	// 	const image = largeImgRef.current
+
+	// 	image.addEventListener("mousedown", handleMouseDown) 
+
+	// 	function handleMouseDown(e) {
+	// 		let startX = e.clientX
+	// 		let startY = e.clientY
+			
+	// 	}
+
+	// 	return () => {
+	// 		image.removeEventListener("mousedown", handleMouseDown)
+	// 	}
+	// }, [])
+
+
+
 	useEffect(() => {
 		largeImgRef.current.style.scale = zoomLevel
-		largeImgRef.current.style["object-position"] = "50%"
+		setLargeImgOverflow((prev) => {
+			const image = largeImgRef.current
+			const parentWrapper = largeImgWrapperRef.current
+
+			const parentHeight = parentWrapper.scrollHeight
+			const imageHeight = image.clientHeight
+
+			const parentWidth = parentWrapper.scrollWidth
+			const imageWidth = image.clientWidth
+
+			let scrollX = false;
+			let scrollY = false
+
+
+			if (parentWidth > imageWidth) {
+				scrollX = true
+			} else {
+				scrollX = false
+			}
+
+
+			if (parentHeight > imageHeight) {
+				scrollY = true
+			} else {
+				scrollY = false
+			}
+
+			return {
+				x: scrollX,
+				y: scrollY
+			}
+
+		})
 	}, [zoomLevel])
 
 	function scrollForward() {
-		console.log("scroll forward")
 		sliderWrapperRef.current.scrollBy({ top: 0, left: 200, behavior: "smooth" })
 	}
 
@@ -37,13 +93,23 @@ export const Lightbox = ({ images, close }) => {
 		sliderWrapperRef.current.scrollBy({ top: 0, left: -200, behavior: "smooth" })
 	}
 
-	function copyImageUrl(text) {
+	function getImageUrl() {
+		const image = images[imageIndex]
+		let text = typeof image.image == "object" ? image.image.src : image.image
+		if (!text.startsWith("http://") && !text.startsWith("https://")) {
+			text = window.location.origin + text
+		}
+
+		return text
+	}
+
+	function copyImageUrl() {
+		const text = getImageUrl()
 		navigator.clipboard.writeText(text)
-		alert("Image url copied!")
+		alert("Image url copied! : " + text)
 	}
 
 	function prevImage() {
-		normalizeZoom()
 		setImageIndex(prev => {
 			if (prev === 0) return maxIndex
 			return prev - 1
@@ -51,7 +117,6 @@ export const Lightbox = ({ images, close }) => {
 	}
 
 	function nextImage() {
-		normalizeZoom()
 		setImageIndex(prev => {
 			if (prev === maxIndex) return 0
 			return prev + 1
@@ -62,27 +127,28 @@ export const Lightbox = ({ images, close }) => {
 	return (
 		<div className={Styles.Wrapper}>
 			<div className={Styles.ContentWrapper}>
-
 				<div className={Styles.ToolsMenu}>
+					<h3>{images[imageIndex].text}  </h3>
+
 					<div className={Styles.Options}>
-						<button type='button' onClick={() => zoomIn()} className={Styles.CopyBtn}>
+						<button type='button' onClick={() => zoomIn()} className={Styles.ToolBtn}>
 							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
 								<HiZoomIn />
 							</IconContext.Provider>
 						</button>
-						<button type='button' onClick={() => zoomOut()} className={Styles.CopyBtn}>
+						<button type='button' onClick={() => zoomOut()} className={Styles.ToolBtn}>
 							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
 								<HiZoomOut />
 							</IconContext.Provider>
 						</button>
-						<button type='button' onClick={() => copyImageUrl(images[imageIndex].image)} className={Styles.CopyBtn}>
+						<button type='button' onClick={() => copyImageUrl()} className={Styles.ToolBtn}>
 							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
-								<FaEdit />
+								<FaRegCopy />
 							</IconContext.Provider>
 						</button>
-						<a href="" download={images[imageIndex].image}>
+						<a href={getImageUrl()} download className={Styles.ToolBtn}>
 							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
-								<FaArrowDown />
+								<HiOutlineDownload />
 							</IconContext.Provider>
 						</a>
 					</div>
@@ -99,8 +165,30 @@ export const Lightbox = ({ images, close }) => {
 						</IconContext.Provider>
 					</button>
 
-					<div className={Styles.LargeImageWrapper} >
-						<Image className={Styles.LargeImage} alt={images[imageIndex].text} src={images[imageIndex].image} fill ref={largeImgRef} />
+					<div className={Styles.LargeImageWrapper} ref={largeImgWrapperRef}>
+						<Image
+							className={`${Styles.LargeImage} ${largeImgOverflow.x == true && largeImgOverflow.y == true ? (
+								Styles.LargeImage__ShiftXY
+							) : (
+								largeImgOverflow.x == true ? (
+									Styles.LargeImage__ShiftX
+								) : (
+									largeImgOverflow.y == true ? (
+										Styles.LargeImage__ShiftY
+									) : (
+										Styles.LargeImage__NoShift
+									)
+								)
+							)
+								}`}
+							alt={images[imageIndex].text}
+							src={images[imageIndex].image}
+							fill
+							sizes="90vw"
+							ref={largeImgRef}
+						// placeholder="blur"
+						// blurDataURL={images[imageIndex].blurHash}
+						/>
 					</div>
 
 					<button onClick={nextImage} className={`${Styles.LargeImgNavBtn} ${Styles.LargeImgNavBtn__Right}`}>
@@ -121,7 +209,12 @@ export const Lightbox = ({ images, close }) => {
 						{
 							images.map((item, index) => (
 								<li key={index} className={`${Styles.SliderItemWrapper} ${item.id === images[imageIndex].id ? Styles.ItemActive : ""}`} onClick={() => setImageIndex(index)} tabIndex={0} ref={item.id === images[imageIndex].id ? activePreviewImgRef : null}>
-									<Image className={Styles.SliderImage} alt={item.text} src={item.image} fill />
+									<Image className={Styles.SliderImage} alt={item.text} src={item.image} fill
+										// placeholder="blur" 
+										sizes="33vw"
+									// blurDataURL={item.blurHash}
+									/>
+
 								</li>
 							))
 						}
@@ -138,56 +231,3 @@ export const Lightbox = ({ images, close }) => {
 	)
 }
 
-function useImageZoom() {
-	// zoom level ---- 0.4x 0.6x 0.8x 1x 1.2x 1.4x 1.6x 1.8x 2.0x
-	const [currentZoomLevel, setCurrentZoomLevel] = useState(1)
-	const maxZoomInLevel = 2.4
-	const maxZoomOutLevel = 0.4
-	const delta = 0.2
-
-	function zoomIn() {
-		setCurrentZoomLevel(
-			prev => {
-				if (prev === maxZoomInLevel) {
-					console.log("prev: ", prev)
-					return prev
-				}
-				return sumDecimals(prev, delta)
-			}
-		)
-	}
-
-	function zoomOut() {
-		setCurrentZoomLevel(
-			prev => {
-				if (prev === maxZoomOutLevel) {
-					console.log("prev: ", prev)
-					return prev
-				}
-				return subtractDecimals(prev, delta)
-			}
-		)
-	}
-
-
-	// sumDecimals  and subtractDecimals are used to avoid the weird issue with adding or subtracting less than 1 numbers in javascript
-	function sumDecimals(num1, num2) {
-		return ((num1 * 10) + (num2 * 10)) / 10
-	}
-
-	function subtractDecimals(num1, num2) {
-		return ((num1 * 10) - (num2 * 10)) / 10
-	}
-
-	function normalizeZoom() {
-		setCurrentZoomLevel(1)
-	}
-
-	return {
-		zoomIn,
-		zoomOut,
-		zoomLevel: currentZoomLevel,
-		normalizeZoom
-	}
-
-}

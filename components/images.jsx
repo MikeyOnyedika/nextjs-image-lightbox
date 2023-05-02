@@ -99,7 +99,36 @@ let images = [
 		id: randomId(10),
 		text: "Mountain 15",
 		image: Mountain15
+	}, {
+		id: randomId(10),
+		text: "Mountain 16",
+		image: Mountain9
 	},
+	{
+		id: randomId(10),
+		text: "Mountain 17",
+		image: Mountain10
+	},
+	{
+		id: randomId(10),
+		text: "Mountain 18",
+		image: Mountain11
+	},
+	{
+		id: randomId(10),
+		text: "Mountain 19",
+		image: Mountain12
+	},
+	{
+		id: randomId(10),
+		text: "Mountain 20",
+		image: Mountain13
+	},
+	{
+		id: randomId(10),
+		text: "Mountain 21",
+		image: Mountain14
+	}
 ]
 
 export default images

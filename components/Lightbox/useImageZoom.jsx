@@ -1,19 +1,13 @@
 import { useState } from 'react'
-export const zoomDir = {
-    IN: 'IN',
-    OUT: 'OUT'
-}
 
 export function useImageZoom() {
     // zoom level ---- 0.4x 0.6x 0.8x 1x 1.2x 1.4x 1.6x 1.8x 2.0x
     const [currentZoomLevel, setCurrentZoomLevel] = useState(1)
-    const [currentZoomDir, setCurrentZoomDir] = useState()
     const maxZoomInLevel = 2.4
     const maxZoomOutLevel = 0.4
     const delta = 0.2
 
     function zoomIn() {
-        setCurrentZoomDir(zoomDir.IN)
         setCurrentZoomLevel(
             prev => {
                 if (prev === maxZoomInLevel) {
@@ -25,7 +19,6 @@ export function useImageZoom() {
     }
 
     function zoomOut() {
-        setCurrentZoomDir(zoomDir.OUT)
         setCurrentZoomLevel(
             prev => {
                 if (prev === maxZoomOutLevel) {
@@ -58,7 +51,6 @@ export function useImageZoom() {
         zoomOut,
         zoomLevel: currentZoomLevel,
         normalizeZoom,
-        zoomDirection: currentZoomDir
     }
 
 }

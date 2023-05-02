@@ -16,48 +16,57 @@ export const Lightbox = ({ images, close }) => {
 	const activePreviewImgRef = useRef()
 	const largeImgRef = useRef()
 	const largeImgWrapperRef = useRef()
+	const largeImgItem = useRef()
 
-	const { zoomIn, zoomOut, zoomLevel, normalizeZoom, zoomDirection } = useImageZoom()
+	const { zoomIn, zoomOut, zoomLevel, normalizeZoom } = useImageZoom()
 
 	const maxIndex = images.length - 1
 
 	//if currently selected image preview is not visible, scroll it into view
 	useEffect(() => {
-		normalizeZoom()
-		activePreviewImgRef.current.scrollIntoView({ behavior: "smooth" })
+
+		// the delay gotten from temporarily putting the scroll call onto the queue makes both scrolling work without either the scroll for the largeImgItem or that for the sliderWrapperRef from breaking
+		setTimeout(() => {
+			largeImgItem.current.scrollIntoView({ behavior: "smooth" })
+		}, 0)
+
+		// only scroll to element if it's not in the visible part of the slider. a.k.a if it's hidden
+		if (checkSlideImageVisible() === false) {
+			sliderWrapperRef.current.scrollTo({ left: activePreviewImgRef.current.offsetLeft, behavior: "smooth" })
+		}
+
+		// if all 4 boundaries of the image are found inside the slider's visible boundaries, then it's visible
+		function checkSlideImageVisible() {
+			const activeImg = activePreviewImgRef.current
+			const slider = sliderWrapperRef.current
+
+			const activeImgRect = activeImg.getBoundingClientRect()
+			const sliderRect = slider.getBoundingClientRect()
+
+			if (
+				activeImgRect.top >= sliderRect.top &&
+				activeImgRect.right <= sliderRect.right &&
+				activeImgRect.bottom <= sliderRect.bottom &&
+				activeImgRect.left >= sliderRect.left
+			) {
+				return true
+			}
+			return false
+		}
+
 	}, [imageIndex])
-
-
-
-	// useEffect(() => {
-	// 	const image = largeImgRef.current
-
-	// 	image.addEventListener("mousedown", handleMouseDown) 
-
-	// 	function handleMouseDown(e) {
-	// 		let startX = e.clientX
-	// 		let startY = e.clientY
-			
-	// 	}
-
-	// 	return () => {
-	// 		image.removeEventListener("mousedown", handleMouseDown)
-	// 	}
-	// }, [])
-
 
 
 	useEffect(() => {
 		largeImgRef.current.style.scale = zoomLevel
 		setLargeImgOverflow((prev) => {
 			const image = largeImgRef.current
-			const parentWrapper = largeImgWrapperRef.current
+			const parentWrapper = largeImgItem.current
+			const parentWidth = parentWrapper.scrollWidth
+			const imageWidth = image.offsetWidth
 
 			const parentHeight = parentWrapper.scrollHeight
-			const imageHeight = image.clientHeight
-
-			const parentWidth = parentWrapper.scrollWidth
-			const imageWidth = image.clientWidth
+			const imageHeight = image.offsetHeight
 
 			let scrollX = false;
 			let scrollY = false
@@ -88,7 +97,6 @@ export const Lightbox = ({ images, close }) => {
 		sliderWrapperRef.current.scrollBy({ top: 0, left: 200, behavior: "smooth" })
 	}
 
-
 	function scrollBackward() {
 		sliderWrapperRef.current.scrollBy({ top: 0, left: -200, behavior: "smooth" })
 	}
@@ -109,18 +117,25 @@ export const Lightbox = ({ images, close }) => {
 		alert("Image url copied! : " + text)
 	}
 
+	// the setTimeout is essentially to give a short delay for normalizeZoom() to acutally take effect before page transition is carried out
 	function prevImage() {
-		setImageIndex(prev => {
-			if (prev === 0) return maxIndex
-			return prev - 1
-		})
+		normalizeZoom()
+		setTimeout(() => {
+			setImageIndex(prev => {
+				if (prev === 0) return maxIndex
+				return prev - 1
+			})
+		}, 0);
 	}
 
 	function nextImage() {
-		setImageIndex(prev => {
-			if (prev === maxIndex) return 0
-			return prev + 1
-		})
+		normalizeZoom()
+		setTimeout(() => {
+			setImageIndex(prev => {
+				if (prev === maxIndex) return 0
+				return prev + 1
+			})
+		}, 0)
 	}
 
 
@@ -129,7 +144,6 @@ export const Lightbox = ({ images, close }) => {
 			<div className={Styles.ContentWrapper}>
 				<div className={Styles.ToolsMenu}>
 					<h3>{images[imageIndex].text}  </h3>
-
 					<div className={Styles.Options}>
 						<button type='button' onClick={() => zoomIn()} className={Styles.ToolBtn}>
 							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
@@ -165,31 +179,39 @@ export const Lightbox = ({ images, close }) => {
 						</IconContext.Provider>
 					</button>
 
-					<div className={Styles.LargeImageWrapper} ref={largeImgWrapperRef}>
-						<Image
-							className={`${Styles.LargeImage} ${largeImgOverflow.x == true && largeImgOverflow.y == true ? (
-								Styles.LargeImage__ShiftXY
-							) : (
-								largeImgOverflow.x == true ? (
-									Styles.LargeImage__ShiftX
-								) : (
-									largeImgOverflow.y == true ? (
-										Styles.LargeImage__ShiftY
-									) : (
-										Styles.LargeImage__NoShift
-									)
-								)
-							)
-								}`}
-							alt={images[imageIndex].text}
-							src={images[imageIndex].image}
-							fill
-							sizes="90vw"
-							ref={largeImgRef}
-						// placeholder="blur"
-						// blurDataURL={images[imageIndex].blurHash}
-						/>
-					</div>
+					<ul className={Styles.LargeImageWrapper} ref={largeImgWrapperRef}>
+						{
+							images.map((item, index) => (
+								<li key={index} className={Styles.LargeImgItem}
+									ref={item.id === images[imageIndex].id ? largeImgItem : null}
+								>
+									<Image
+										className={`${Styles.LargeImage} ${largeImgOverflow.x == true && largeImgOverflow.y == true ? (
+											Styles.LargeImage__ShiftXY
+										) : (
+											largeImgOverflow.x == true ? (
+												Styles.LargeImage__ShiftX
+											) : (
+												largeImgOverflow.y == true ? (
+													Styles.LargeImage__ShiftY
+												) : (
+													Styles.LargeImage__NoShift
+												)
+											)
+										)
+											}`}
+										alt={item.text}
+										src={item.image}
+										fill
+										sizes="(min-width: 360px) 30rem, (min-width: 500px) 50rem"
+										// placeholder="blur"
+										// blurDataURL={images[imageIndex].blurHash}
+										ref={item.id === images[imageIndex].id ? largeImgRef : null}
+									/>
+								</li>
+							))
+						}
+					</ul>
 
 					<button onClick={nextImage} className={`${Styles.LargeImgNavBtn} ${Styles.LargeImgNavBtn__Right}`}>
 						<IconContext.Provider value={{ className: Styles.LargeBtnIcon }}>

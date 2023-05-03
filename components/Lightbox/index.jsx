@@ -22,6 +22,107 @@ export const Lightbox = ({ images, close }) => {
 
 	const maxIndex = images.length - 1
 
+
+	// this is run whenever a new image is selected. i.e whenever imageIndex changes.
+	// Handle image panning here
+	useEffect(() => {
+		let isDown = false
+		let startCoords = {}
+		let scrollLeft;
+		let scrollTop;
+		let canHandleMouseMove = true
+
+		addEventListeners()
+
+		function handleMouseDown(e) {
+			e.preventDefault()
+			isDown = true;
+
+			largeImgItem.current.classList.add(Styles.Draggable)
+
+			// makes sure the start coordinate is measured relative to were the image container started as opposed to measured relative to the document
+			startCoords = {
+				x: e.pageX - largeImgItem.current.offsetLeft,
+				y: e.pageY - largeImgItem.current.offsetTop,
+			}
+
+			// take note of the current amount of scrolling the image container already has
+			scrollLeft = largeImgItem.current.scrollLeft
+			scrollTop = largeImgItem.current.scrollTop
+
+		}
+
+		function handleMouseLeave(e) {
+			e.preventDefault()
+			isDown = false;
+			largeImgItem.current.classList.remove(Styles.Draggable)
+		}
+
+		function handleMouseUp(e) {
+			e.preventDefault()
+			isDown = false;
+			largeImgItem.current.classList.remove(Styles.Draggable)
+		}
+
+		function handleMouseMove(e) {
+			if (!canHandleMouseMove) return;
+			if (!isDown) return;
+
+			// prevent calling the handler again before it finishes running
+			canHandleMouseMove = false
+			e.preventDefault()
+
+			const scrollLeft = largeImgItem.current.scrollLeft
+			const scrollTop = largeImgItem.current.scrollTop
+
+			// again, measure the mouse coordinate relative to the start position of the image container, not the whole document
+			const finalMouseX = e.pageX - largeImgItem.current.offsetLeft
+			const finalMouseY = e.pageY - largeImgItem.current.offsetTop
+
+			// calcualte the change in the position of the mouse
+			const deltaX = finalMouseX - startCoords.x
+			const deltaY = finalMouseY - startCoords.y
+
+			const speed = 30
+
+			// dividing delta reduces it and therefore reduces the amount of change in the coordinate of the image container. This slows the movement down and that's good 
+			largeImgItem.current.scrollLeft = scrollLeft - (deltaX !== 0 ? deltaX / speed : deltaX)
+			largeImgItem.current.scrollTop = scrollTop - (deltaY !== 0 ? deltaY / speed : deltaY)
+
+			canHandleMouseMove = true
+			// allow calling the handler again after 100ms 
+			// setTimeout(() => {
+			// 	canHandleMouseMove = true	
+			// }, 50);
+		}
+
+
+		function removeListeners() {
+			if (largeImgRef.current != null) {
+				const img = largeImgRef.current
+				img.removeEventListener("mousedown", handleMouseDown)
+				img.removeEventListener("mouseup", handleMouseUp)
+				img.removeEventListener("mousemove", handleMouseMove)
+				img.removeEventListener("mouseleave", handleMouseLeave)
+			}
+		}
+
+		function addEventListeners() {
+			if (largeImgRef.current != null) {
+				const img = largeImgRef.current
+				img.addEventListener("mousedown", handleMouseDown)
+				img.addEventListener("mouseup", handleMouseUp)
+				img.addEventListener("mousemove", handleMouseMove)
+				img.addEventListener("mouseleave", handleMouseLeave)
+			}
+		}
+
+		return () => {
+			removeListeners()
+		}
+
+	}, [imageIndex])
+
 	//if currently selected image preview is not visible, scroll it into view
 	useEffect(() => {
 
@@ -232,11 +333,8 @@ export const Lightbox = ({ images, close }) => {
 							images.map((item, index) => (
 								<li key={index} className={`${Styles.SliderItemWrapper} ${item.id === images[imageIndex].id ? Styles.ItemActive : ""}`} onClick={() => setImageIndex(index)} tabIndex={0} ref={item.id === images[imageIndex].id ? activePreviewImgRef : null}>
 									<Image className={Styles.SliderImage} alt={item.text} src={item.image} fill
-										// placeholder="blur" 
-										sizes="33vw"
-									// blurDataURL={item.blurHash}
+										sizes="20vw"
 									/>
-
 								</li>
 							))
 						}

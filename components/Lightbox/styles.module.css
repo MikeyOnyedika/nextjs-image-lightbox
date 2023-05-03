@@ -10,10 +10,25 @@
 }
 
 .Wrapper,
-.Wrapper * {
+.Wrapper *,
+.Wrapper::before,
+.Wrapper::after {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
+	/* -webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none; */
+
+	user-drag: none;
+	-webkit-user-drag: none;
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+
 }
 
 .ContentWrapper {
@@ -106,7 +121,7 @@
 	scroll-snap-type: x mandatory;
 }
 
-.LargeImageWrapper::-webkit-scrollbar{
+.LargeImageWrapper::-webkit-scrollbar {
 	width: 0px;
 	height: 0px;
 }
@@ -232,9 +247,10 @@
 	position: relative;
 	aspect-ratio: 16/9;
 	border: 1px solid #5599b7;
-	opacity: 0.5;
-	border-radius: 2px;
+	opacity: 0.4;
 	min-width: 5rem;
+	border-radius: 5px;
+	;
 }
 
 .ItemActive {
@@ -244,8 +260,8 @@
 
 /* preserve the aspect ratio of the actual image*/
 .SliderImage {
-	object-fit: contain;
-	-o-object-fit: contain;
+	object-fit: cover;
+	-o-object-fit: cover;
 }
 
 
@@ -265,4 +281,11 @@
 .SliderBtn:hover .BtnIcon,
 .SliderBtn:hover {
 	background-color: #5599b7;
+}
+
+
+/* Styles for panning of zoomed image */
+
+.Draggable {
+	cursor: grabbing;
 }

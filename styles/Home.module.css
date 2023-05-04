@@ -25,6 +25,7 @@
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   padding: 0;
   gap: 0;
+  cursor: pointer;
 }
 
 .media_item > div{
@@ -48,3 +49,7 @@
 .media_item > div > p {
   font-size: 1rem;
 }
+
+
+
+/* opening and closing the lightbox */

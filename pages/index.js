@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Lightbox } from "@/components/Lightbox";
 import images from "@/components/images";
 import Styles from "../styles/Home.module.css"
@@ -12,6 +12,10 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false)
   const backgroundImage = images[0]
 
+  useEffect(() => { 
+    console.log("isOpen:", isOpen)
+  }, [isOpen])
+
   return (
     <>
       <Head>
@@ -21,9 +25,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${Styles.Main} ${poppins.className}`}>
-        {
-          isOpen && <Lightbox images={images} close={() => setIsOpen(false)} />
-        }
+
+        <Lightbox images={images} isOpen={isOpen} close={() => setIsOpen(false)} />
+
         <h1>Nextjs Image Lightbox</h1>
         <div>
           <button className={styles.media_item} href="#" onClick={() => setIsOpen(true)}>

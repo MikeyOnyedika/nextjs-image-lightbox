@@ -4,13 +4,18 @@ import { useRef, useState, useEffect } from 'react'
 import { FaAngleRight, FaAngleLeft, FaRegCopy } from 'react-icons/fa'
 import { HiOutlineDownload, HiZoomIn, HiZoomOut } from 'react-icons/hi'
 import { IconContext } from 'react-icons'
-import { CloseBtn } from './close'
+import { CloseBtn } from './CloseBtn'
 import { useImageZoom } from './useImageZoom'
+import { Alert } from './Alert'
+import { useExpiringState } from './useExpiringState'
 
-export const Lightbox = ({ images, close }) => {
+export const Lightbox = ({ isOpen, images, close, className }) => {
 	const [imageIndex, setImageIndex] = useState(0)
 	const [largeImgOverflow, setLargeImgOverflow] = useState({ x: false, y: false })
+	const [alertMessage, setAlertMessage, isAlertMessageExpired, respawn] = useExpiringState(null)
 
+
+	const wrapperRef = useRef()
 	const sliderWrapperRef = useRef()
 	const largeImageViewWrapperRef = useRef()
 	const activePreviewImgRef = useRef()
@@ -206,7 +211,9 @@ export const Lightbox = ({ images, close }) => {
 		const image = images[imageIndex]
 		let text = typeof image.image == "object" ? image.image.src : image.image
 		if (!text.startsWith("http://") && !text.startsWith("https://")) {
-			text = window.location.origin + text
+			if (typeof window !== "undefined") {
+				text = window.location.origin + text
+			}
 		}
 
 		return text
@@ -215,7 +222,8 @@ export const Lightbox = ({ images, close }) => {
 	function copyImageUrl() {
 		const text = getImageUrl()
 		navigator.clipboard.writeText(text)
-		alert("Image url copied! : " + text)
+		setAlertMessage("URL copied!")
+		respawn()
 	}
 
 	// the setTimeout is essentially to give a short delay for normalizeZoom() to acutally take effect before page transition is carried out
@@ -239,9 +247,48 @@ export const Lightbox = ({ images, close }) => {
 		}, 0)
 	}
 
+	function openLightbox() {
+		console.log(wrapperRef.current)
+		if (typeof window === "undefined") return
+		if (wrapperRef.current === undefined) return
+		const styles = window.getComputedStyle(wrapperRef.current)
+		const wrapper = wrapperRef.current
+		// change the value of `display` property to 'flex'
+		wrapper.style.display = "flex"
+
+		return Styles.OpenLightbox
+	}
+
+	// closeligtbox triggers the close animation by adding the Styles.CloseLightbox class to the wrapper div. 
+	function closeLightbox() {
+		console.log(wrapperRef.current)
+		if (typeof window === "undefined") return
+		if (wrapperRef.current === undefined) return
+		const styles = window.getComputedStyle(wrapperRef.current)
+
+		return Styles.CloseLightbox
+	}
+
+
+	// once the Styles.CloseLightbox class is added to wrapper div, close animation starts. When this close animation finishes runniny, this function is triggered to make the wrapper div disappear by setting it's `display` to `none`
+	function handleAnimationEnd(e) {
+		e.preventDefault()
+
+		if (typeof window === "undefined") return;
+		const wrapper = wrapperRef.current
+		const styles = window.getComputedStyle(wrapper)
+
+		if (wrapper.classList.contains(Styles.CloseLightbox)) {
+			console.log("animation ended")
+			wrapper.style.display = "none"
+		}
+	}
+
 
 	return (
-		<div className={Styles.Wrapper}>
+		<div className={`${Styles.Wrapper} ${isOpen ? openLightbox() : closeLightbox()}`} ref={wrapperRef} onAnimationEnd={handleAnimationEnd} >
+			<Alert message={alertMessage} className={isAlertMessageExpired ? Styles.Hide : Styles.Show} />
+
 			<div className={Styles.ContentWrapper}>
 				<div className={Styles.ToolsMenu}>
 					<h3>{images[imageIndex].text}  </h3>

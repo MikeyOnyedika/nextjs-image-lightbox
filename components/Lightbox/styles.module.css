@@ -1,34 +1,59 @@
+/* for opening and closing the lightbox from a parent component */
+.OpenLightbox {
+	animation-name: openLightbox;
+}
+
+.CloseLightbox {
+	/* display: none; */
+	animation-name: closeLightbox;
+}
+
+@keyframes openLightbox {
+	from {
+		scale: 0.8;
+		opacity: 0.8;
+	}
+
+	to {
+		scale: 1;
+		opacity: 1;
+	}
+}
+
+
+@keyframes closeLightbox {
+	from {
+		scale: 1;
+		opacity: 1;
+	}
+
+	to {
+		scale: 0.8;
+		opacity: 0.8;
+	}
+}
+
+/* styling the lightbox wrapper element */
 .Wrapper {
+	/* set display to none at first so that lightbox is not displayed when component is first mounted */
+	display: none;
+	animation-duration: 100ms;
+	animation-timing-function: ease-in-out;
 	position: fixed;
 	inset: 0;
+	opacity: 1;
 	height: 100vh;
 	width: 100vw;
-	display: flex;
 	z-index: 100;
 	background-color: rgba(255, 255, 255, 0.8);
-
+	justify-content: center;
 }
 
 .Wrapper,
-.Wrapper *,
-.Wrapper::before,
-.Wrapper::after {
+.Wrapper * {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	/* -webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-o-user-select: none;
-	user-select: none; */
-
-	user-drag: none;
-	-webkit-user-drag: none;
-	user-select: none;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
-
 }
 
 .ContentWrapper {
@@ -55,7 +80,8 @@
 	font-weight: 400;
 	justify-self: flex-start;
 	padding-inline-start: 1rem;
-	width: 20%;
+	max-width: 20%;
+	/* width: 20%; */
 	text-overflow: ellipsis;
 	line-clamp: 1;
 	-webkit-line-clamp: 1;
@@ -64,8 +90,8 @@
 }
 
 .Options {
+	justify-self: center;
 	display: flex;
-	width: 100%;
 	justify-content: flex-end;
 	color: rgba(0, 0, 0, 0.9);
 }
@@ -96,7 +122,6 @@
 	align-items: center;
 	padding: 1rem;
 }
-
 
 
 /* large image view */
@@ -134,6 +159,11 @@
 	min-width: 100%;
 	scroll-snap-align: start;
 	overflow: auto;
+}
+
+.LargeImgItem::-webkit-scrollbar {
+	width: 0px;
+	height: 0px;
 }
 
 .LargeImage {
@@ -288,4 +318,42 @@
 
 .Draggable {
 	cursor: grabbing;
+}
+
+
+/* Alert dialog styles */
+.AlertWrapper {
+	position: fixed;
+	background: white;
+	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+	transition: transform 300ms ease-in-out;
+	top: 1rem;
+	display: flex;
+	align-items: stretch;
+	justify-content: space-between;
+	z-index: 2;
+	border-radius: 5px;
+}
+
+.AlertWrapper .Bar {
+	border-radius: 5px 0 0 5px;
+	align-self: stretch;
+	width: 0.5rem;
+	background-color: rgb(34, 130, 34);
+}
+
+.AlertWrapper .Message {
+	padding: auto;
+	color: rgb(32, 126, 32);
+	font-size: 0.9rem;
+	padding-inline: 1rem;
+	padding-block: 0.8rem;
+}
+
+.AlertWrapper.Show {
+	transform: translateY(0%);
+}
+
+.AlertWrapper.Hide {
+	transform: translateY(calc(-100% - 2rem));
 }

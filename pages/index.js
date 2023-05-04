@@ -12,10 +12,6 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false)
   const backgroundImage = images[0]
 
-  useEffect(() => { 
-    console.log("isOpen:", isOpen)
-  }, [isOpen])
-
   return (
     <>
       <Head>

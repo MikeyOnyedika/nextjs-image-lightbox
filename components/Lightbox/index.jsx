@@ -9,7 +9,7 @@ import { useImageZoom } from './useImageZoom'
 import { Alert } from './Alert'
 import { useExpiringState } from './useExpiringState'
 
-export const Lightbox = ({ isOpen, images, close, className }) => {
+export const Lightbox = ({ isOpen, images, close }) => {
 	const [imageIndex, setImageIndex] = useState(0)
 	const [largeImgOverflow, setLargeImgOverflow] = useState({ x: false, y: false })
 	const [alertMessage, setAlertMessage, isAlertMessageExpired, respawn] = useExpiringState(null)
@@ -207,22 +207,22 @@ export const Lightbox = ({ isOpen, images, close, className }) => {
 		sliderWrapperRef.current.scrollBy({ top: 0, left: -200, behavior: "smooth" })
 	}
 
-	function getImageUrl() {
+	function getUrlTextRegardlessOfDomain() {
 		const image = images[imageIndex]
 		let text = typeof image.image == "object" ? image.image.src : image.image
+		return text
+	}
+
+	// basically preparing the full path of the image
+	function copyImageUrl() {
+		let text = getUrlTextRegardlessOfDomain()
 		if (!text.startsWith("http://") && !text.startsWith("https://")) {
 			if (typeof window !== "undefined") {
 				text = window.location.origin + text
 			}
 		}
-
-		return text
-	}
-
-	function copyImageUrl() {
-		const text = getImageUrl()
 		navigator.clipboard.writeText(text)
-		setAlertMessage("URL copied!")
+		setAlertMessage("Image URL copied!")
 		respawn()
 	}
 
@@ -248,12 +248,10 @@ export const Lightbox = ({ isOpen, images, close, className }) => {
 	}
 
 	function openLightbox() {
-		console.log(wrapperRef.current)
 		if (typeof window === "undefined") return
 		if (wrapperRef.current === undefined) return
-		const styles = window.getComputedStyle(wrapperRef.current)
 		const wrapper = wrapperRef.current
-		// change the value of `display` property to 'flex'
+		// change the value of `display` property to 'flex' before the class to animate the showing of the lightbox is added
 		wrapper.style.display = "flex"
 
 		return Styles.OpenLightbox
@@ -261,7 +259,6 @@ export const Lightbox = ({ isOpen, images, close, className }) => {
 
 	// closeligtbox triggers the close animation by adding the Styles.CloseLightbox class to the wrapper div. 
 	function closeLightbox() {
-		console.log(wrapperRef.current)
 		if (typeof window === "undefined") return
 		if (wrapperRef.current === undefined) return
 		const styles = window.getComputedStyle(wrapperRef.current)
@@ -270,16 +267,12 @@ export const Lightbox = ({ isOpen, images, close, className }) => {
 	}
 
 
-	// once the Styles.CloseLightbox class is added to wrapper div, close animation starts. When this close animation finishes runniny, this function is triggered to make the wrapper div disappear by setting it's `display` to `none`
+	// once the Styles.CloseLightbox class is added to wrapper div, close animation starts. When this close animation finishes running, this function is triggered to make the wrapper div disappear by setting it's `display` to `none`
 	function handleAnimationEnd(e) {
 		e.preventDefault()
-
 		if (typeof window === "undefined") return;
 		const wrapper = wrapperRef.current
-		const styles = window.getComputedStyle(wrapper)
-
 		if (wrapper.classList.contains(Styles.CloseLightbox)) {
-			console.log("animation ended")
 			wrapper.style.display = "none"
 		}
 	}
@@ -308,7 +301,8 @@ export const Lightbox = ({ isOpen, images, close, className }) => {
 								<FaRegCopy />
 							</IconContext.Provider>
 						</button>
-						<a href={getImageUrl()} download className={Styles.ToolBtn}>
+
+						<a href={getUrlTextRegardlessOfDomain()} download className={Styles.ToolBtn}>
 							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
 								<HiOutlineDownload />
 							</IconContext.Provider>

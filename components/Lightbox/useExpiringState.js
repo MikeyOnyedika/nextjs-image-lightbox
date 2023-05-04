@@ -24,7 +24,6 @@ export const useExpiringState = (initialValue, timeout = 2000) => {
 
     //basically, say the state is valid again
     function makeValidAgain() {
-        console.log("respawned")
         setIsExpired(false)
     }
 

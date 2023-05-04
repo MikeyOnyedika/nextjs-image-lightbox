@@ -1,10 +1,9 @@
-/* for opening and closing the lightbox from a parent component */
+/* for opening and closing the lightbox */
 .OpenLightbox {
 	animation-name: openLightbox;
 }
 
 .CloseLightbox {
-	/* display: none; */
 	animation-name: closeLightbox;
 }
 
@@ -111,8 +110,15 @@
 }
 
 .OptionBtnIcon {
-	color: rgba(0, 0, 0, 0.9);
 	padding: 0.7rem;
+}
+
+.Enabled {
+	color: rgba(0, 0, 0, 0.9);
+}
+
+.Disabled {
+	color: rgba(160, 160, 160, 0.9);
 }
 
 .CloseBtn {

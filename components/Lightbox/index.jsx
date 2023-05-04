@@ -23,8 +23,9 @@ export const Lightbox = ({ isOpen, images, close }) => {
 	const largeImgWrapperRef = useRef()
 	const largeImgItem = useRef()
 
-	const { zoomIn, zoomOut, zoomLevel, normalizeZoom } = useImageZoom()
+	const { zoomIn, zoomOut, zoomLevel, normalizeZoom, maxZoomInLevel, maxZoomOutLevel } = useImageZoom()
 
+	// the index of the last image in the list of images used in the lightbox
 	const maxIndex = images.length - 1
 
 
@@ -163,6 +164,7 @@ export const Lightbox = ({ isOpen, images, close }) => {
 	}, [imageIndex])
 
 
+	// 
 	useEffect(() => {
 		largeImgRef.current.style.scale = zoomLevel
 		setLargeImgOverflow((prev) => {
@@ -284,26 +286,26 @@ export const Lightbox = ({ isOpen, images, close }) => {
 
 			<div className={Styles.ContentWrapper}>
 				<div className={Styles.ToolsMenu}>
-					<h3>{images[imageIndex].text}  </h3>
+					<h3>{images[imageIndex].text} </h3>
 					<div className={Styles.Options}>
 						<button type='button' onClick={() => zoomIn()} className={Styles.ToolBtn}>
-							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
+							<IconContext.Provider value={{ className: `${Styles.OptionBtnIcon} ${zoomLevel === maxZoomInLevel ? Styles.Disabled : Styles.Enabled }` }}>
 								<HiZoomIn />
 							</IconContext.Provider>
 						</button>
 						<button type='button' onClick={() => zoomOut()} className={Styles.ToolBtn}>
-							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
+							<IconContext.Provider value={{ className: `${Styles.OptionBtnIcon} ${zoomLevel === maxZoomOutLevel ? Styles.Disabled : Styles.Enabled}` }}>
 								<HiZoomOut />
 							</IconContext.Provider>
 						</button>
 						<button type='button' onClick={() => copyImageUrl()} className={Styles.ToolBtn}>
-							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
+							<IconContext.Provider value={{ className: `${Styles.OptionBtnIcon} ${Styles.Enabled}` }}>
 								<FaRegCopy />
 							</IconContext.Provider>
 						</button>
 
 						<a href={getUrlTextRegardlessOfDomain()} download className={Styles.ToolBtn}>
-							<IconContext.Provider value={{ className: Styles.OptionBtnIcon }}>
+							<IconContext.Provider value={{ className: `${Styles.OptionBtnIcon} ${Styles.Enabled}` }}>
 								<HiOutlineDownload />
 							</IconContext.Provider>
 						</a>

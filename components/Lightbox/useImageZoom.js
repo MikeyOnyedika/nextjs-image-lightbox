@@ -51,6 +51,8 @@ export function useImageZoom() {
         zoomOut,
         zoomLevel: currentZoomLevel,
         normalizeZoom,
+        maxZoomInLevel, 
+        maxZoomOutLevel
     }
 
 }

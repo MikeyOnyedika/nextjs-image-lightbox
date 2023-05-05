@@ -29,6 +29,12 @@ export const Lightbox = ({ isOpen, images, close }) => {
 	const maxIndex = images.length - 1
 
 
+	useEffect(() => {
+		// run lightbox open animation
+		startOpenAnimation()
+	}, [])
+
+
 	// this is run whenever a new image is selected. i.e whenever imageIndex changes.
 	// Handle image panning here
 	useEffect(() => {
@@ -249,39 +255,39 @@ export const Lightbox = ({ isOpen, images, close }) => {
 		}, 0)
 	}
 
-	function openLightbox() {
-		if (typeof window === "undefined") return
-		if (wrapperRef.current === undefined) return
+	function startOpenAnimation() {
 		const wrapper = wrapperRef.current
-		// change the value of `display` property to 'flex' before the class to animate the showing of the lightbox is added
-		wrapper.style.display = "flex"
-
-		return Styles.OpenLightbox
+		wrapper.classList.add(Styles.OpenLightbox)
 	}
 
-	// closeligtbox triggers the close animation by adding the Styles.CloseLightbox class to the wrapper div. 
-	function closeLightbox() {
-		if (typeof window === "undefined") return
-		if (wrapperRef.current === undefined) return
-		const styles = window.getComputedStyle(wrapperRef.current)
-
-		return Styles.CloseLightbox
+	// once the Styles.CloseLightbox class is added to wrapper div, close animation starts.
+	function startCloseAnimation(e) {
+		e.preventDefault()
+		// trigger the close animation
+		const wrapper = wrapperRef.current
+		// remove the OpenLightbox class if it's already on the wrapper
+		if (wrapper.classList.contains(Styles.OpenLightbox)) {
+			wrapper.classList.remove(Styles.OpenLightbox)
+		}
+		// add the class for the close animation if it's not already added
+		if (wrapper.classList.contains(Styles.CloseLightbox) === false) {
+			wrapper.classList.add(Styles.CloseLightbox)
+		}
 	}
 
-
-	// once the Styles.CloseLightbox class is added to wrapper div, close animation starts. When this close animation finishes running, this function is triggered to make the wrapper div disappear by setting it's `display` to `none`
+	//  When close animation finishes running, call the close() which sets the state of the lightbox to false, essentially unmounting the component
 	function handleAnimationEnd(e) {
 		e.preventDefault()
 		if (typeof window === "undefined") return;
 		const wrapper = wrapperRef.current
 		if (wrapper.classList.contains(Styles.CloseLightbox)) {
-			wrapper.style.display = "none"
+			// now, close lightbox
+			close()
 		}
 	}
 
-
 	return (
-		<div className={`${Styles.Wrapper} ${isOpen ? openLightbox() : closeLightbox()}`} ref={wrapperRef} onAnimationEnd={handleAnimationEnd} >
+		<div className={`${Styles.Wrapper} `} ref={wrapperRef} onAnimationEnd={handleAnimationEnd} >
 			<Alert message={alertMessage} className={isAlertMessageExpired ? Styles.Hide : Styles.Show} />
 
 			<div className={Styles.ContentWrapper}>
@@ -289,7 +295,7 @@ export const Lightbox = ({ isOpen, images, close }) => {
 					<h3>{images[imageIndex].text} </h3>
 					<div className={Styles.Options}>
 						<button type='button' onClick={() => zoomIn()} className={Styles.ToolBtn}>
-							<IconContext.Provider value={{ className: `${Styles.OptionBtnIcon} ${zoomLevel === maxZoomInLevel ? Styles.Disabled : Styles.Enabled }` }}>
+							<IconContext.Provider value={{ className: `${Styles.OptionBtnIcon} ${zoomLevel === maxZoomInLevel ? Styles.Disabled : Styles.Enabled}` }}>
 								<HiZoomIn />
 							</IconContext.Provider>
 						</button>
@@ -311,7 +317,7 @@ export const Lightbox = ({ isOpen, images, close }) => {
 						</a>
 					</div>
 
-					<button type='button' className={Styles.CloseBtn} onClick={close}>
+					<button type='button' className={Styles.CloseBtn} onClick={startCloseAnimation}>
 						<CloseBtn />
 					</button>
 				</div>

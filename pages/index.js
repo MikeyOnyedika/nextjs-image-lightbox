@@ -12,6 +12,12 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false)
   const backgroundImage = images[0]
 
+  useEffect(() => {
+    console.log(isOpen)
+  
+  }, [isOpen])
+  
+
   return (
     <>
       <Head>
@@ -22,7 +28,11 @@ export default function Home() {
       </Head>
       <main className={`${Styles.Main} ${poppins.className}`}>
 
-        <Lightbox images={images} isOpen={isOpen} close={() => setIsOpen(false)} />
+        {
+          isOpen && (
+            <Lightbox images={images} isOpen={isOpen} close={() => setIsOpen(false)} />
+          )
+        }
 
         <h1>Nextjs Image Lightbox</h1>
         <div>

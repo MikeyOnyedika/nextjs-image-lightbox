@@ -125,12 +125,6 @@ export const Lightbox = ({ isOpen, images, close }) => {
 	}, [zoomLevel])
 
 
-
-
-
-
-
-
 	// this is run whenever a new image is selected. i.e whenever imageIndex changes.
 	// Handle image panning here
 	useEffect(() => {

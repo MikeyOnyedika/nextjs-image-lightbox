@@ -36,7 +36,6 @@ export const Lightbox = ({ isOpen, images, close }) => {
 
 		function handleOnMouseDown(e) {
 			e.preventDefault()
-			console.log("mouse don touch down")
 
 			sliderWrapperRef.current.addEventListener("mouseup", handleMouseUp)
 			sliderWrapperRef.current.addEventListener("mousemove", handleMouseMove)
@@ -55,8 +54,6 @@ export const Lightbox = ({ isOpen, images, close }) => {
 				e.preventDefault()
 
 				const mouseEndX = e.clientX
-
-				console.log("mouseStartX: ", mouseStartX, "  mouseEnd: ", mouseEndX)
 
 				const diff = Math.abs(mouseStartX - mouseEndX)
 				if (mouseStartX > mouseEndX) {

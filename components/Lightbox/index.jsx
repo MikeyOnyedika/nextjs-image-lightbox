@@ -8,6 +8,7 @@ import { CloseBtn } from './CloseBtn'
 import { useImageZoom } from './useImageZoom'
 import { Alert } from './Alert'
 import { useExpiringState } from './useExpiringState'
+import { FitToScreen } from "./FitToScreen"
 
 export const Lightbox = ({ isOpen, images, close }) => {
 	const [imageIndex, setImageIndex] = useState(0)
@@ -32,7 +33,105 @@ export const Lightbox = ({ isOpen, images, close }) => {
 	useEffect(() => {
 		// run lightbox open animation
 		startOpenAnimation()
+
+		function handleOnMouseDown(e) {
+			e.preventDefault()
+			console.log("mouse don touch down")
+
+			sliderWrapperRef.current.addEventListener("mouseup", handleMouseUp)
+			sliderWrapperRef.current.addEventListener("mousemove", handleMouseMove)
+
+
+			function handleMouseUp(e) {
+				e.preventDefault()
+
+				sliderWrapperRef.current.removeEventListener("mousemove", handleMouseMove)
+			}
+
+
+			let mouseStartX = e.clientX
+
+			function handleMouseMove(e) {
+				e.preventDefault()
+
+				const mouseEndX = e.clientX
+
+				console.log("mouseStartX: ", mouseStartX, "  mouseEnd: ", mouseEndX)
+
+				const diff = Math.abs(mouseStartX - mouseEndX)
+				if (mouseStartX > mouseEndX) {
+					sliderWrapperRef.current.scrollBy({ left: diff })
+				}else if(mouseStartX < mouseEndX){
+					sliderWrapperRef.current.scrollBy({ left: -diff })
+				}
+
+
+				mouseStartX = mouseEndX
+			}
+		}
+
+		if (sliderWrapperRef.current != null) {
+			sliderWrapperRef.current.addEventListener("mousedown", handleOnMouseDown)
+		}
+
+		return () => {
+			if (sliderWrapperRef.current != null) {
+				sliderWrapperRef.current.removeEventListener("mousedown", handleOnMouseDown)
+			}
+		}
 	}, [])
+
+	// setup swipe to navigate the large image
+	useEffect(() => {
+		if (zoomLevel === 1) {
+			// set up event handlers 
+			largeImgWrapperRef.current.addEventListener("mousedown", handleOnMouseDown)
+		} else {
+			// tear down event handlers
+			largeImgWrapperRef.current.removeEventListener("mousedown", handleOnMouseDown)
+		}
+
+
+		function handleOnMouseDown(e) {
+			e.preventDefault()
+
+			const mouseStartX = e.clientX
+
+			// then set a listener for when mouse is lifted
+			largeImgWrapperRef.current.addEventListener("mouseup", handleOnMouseUp)
+
+			function handleOnMouseUp(e) {
+				e.preventDefault()
+
+				const mouseEndX = e.clientX
+
+				const threshold = 25
+				if (Math.abs(mouseEndX - mouseStartX) > threshold) {
+					if (mouseEndX < mouseStartX) {
+						nextImage()
+					} else if (mouseEndX > mouseStartX) {
+						prevImage()
+					}
+				}
+
+				largeImgWrapperRef.current.removeEventListener("mouseup", handleOnMouseUp)
+			}
+		}
+
+
+		return () => {
+			if (largeImgWrapperRef.current != null) {
+				largeImgWrapperRef.current.removeEventListener("mousedown", handleOnMouseDown)
+			}
+		}
+
+	}, [zoomLevel])
+
+
+
+
+
+
 
 
 	// this is run whenever a new image is selected. i.e whenever imageIndex changes.
@@ -294,6 +393,9 @@ export const Lightbox = ({ isOpen, images, close }) => {
 				<div className={Styles.ToolsMenu}>
 					<h3>{images[imageIndex].text} </h3>
 					<div className={Styles.Options}>
+						<button type='button' onClick={() => normalizeZoom()} className={Styles.ToolBtn}>
+							<FitToScreen className={`${Styles.OptionBtnIcon} ${Styles.FitSVG} ${zoomLevel === 1 ? Styles.Disabled : Styles.Enabled}`} />
+						</button>
 						<button type='button' onClick={() => zoomIn()} className={Styles.ToolBtn}>
 							<IconContext.Provider value={{ className: `${Styles.OptionBtnIcon} ${zoomLevel === maxZoomInLevel ? Styles.Disabled : Styles.Enabled}` }}>
 								<HiZoomIn />
@@ -371,11 +473,11 @@ export const Lightbox = ({ isOpen, images, close }) => {
 				</div>
 
 				<div className={Styles.ImagePreviewWrapper}>
-					<button type='button' onClick={() => scrollBackward()} className={`${Styles.SliderBtn} ${Styles.SliderBtn__Left}`}>
+					{/* <button type='button' onClick={() => scrollBackward()} className={`${Styles.SliderBtn} ${Styles.SliderBtn__Left}`}>
 						<IconContext.Provider value={{ className: Styles.BtnIcon }}>
 							<FaAngleLeft />
 						</IconContext.Provider>
-					</button>
+					</button> */}
 
 					<ul className={Styles.Slider} ref={sliderWrapperRef}>
 						{
@@ -389,11 +491,11 @@ export const Lightbox = ({ isOpen, images, close }) => {
 						}
 					</ul>
 
-					<button type='button' onClick={() => scrollForward()} className={`${Styles.SliderBtn} ${Styles.SliderBtn__Right}`}>
+					{/* <button type='button' onClick={() => scrollForward()} className={`${Styles.SliderBtn} ${Styles.SliderBtn__Right}`}>
 						<IconContext.Provider value={{ className: Styles.BtnIcon }}>
 							<FaAngleRight />
 						</IconContext.Provider>
-					</button>
+					</button> */}
 				</div>
 			</div>
 		</div >

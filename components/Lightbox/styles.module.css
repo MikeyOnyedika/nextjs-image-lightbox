@@ -111,6 +111,10 @@
 	padding: 0.7rem;
 }
 
+.FitSVG {
+	display: flex;
+}
+
 .Enabled {
 	color: rgba(0, 0, 0, 0.9);
 }
@@ -363,7 +367,9 @@
 }
 
 
-@media (max-width: 360px) {
+@media (max-width: 600px) {
+
+	.LargeImgNavBtn,
 	.SliderBtn {
 		display: none;
 	}

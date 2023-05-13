@@ -74,11 +74,11 @@
 }
 
 .ToolsMenu>h3 {
+	font-size: 1.2rem;
+	width: 40%;
 	font-weight: 400;
 	justify-self: flex-start;
 	padding-inline-start: 1rem;
-	max-width: 20%;
-	/* width: 20%; */
 	text-overflow: ellipsis;
 	line-clamp: 1;
 	-webkit-line-clamp: 1;
